@@ -152,12 +152,19 @@ export default {
       this.$router.push("/login");
     },
 
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      this.newService.image = file;
+      console.log("File dipilih:", file);
+    },
+
     async addService() {
       try {
         const formData = new FormData();
         formData.append("name", this.newService.name);
         formData.append("description", this.newService.description);
         formData.append("price", this.newService.price);
+
         if (this.newService.image) {
           formData.append("image", this.newService.image);
         }
@@ -168,11 +175,12 @@ export default {
             "Content-Type": "multipart/form-data",
           },
         });
+
         this.services.push(response.data);
         this.newService = { name: "", description: "", price: "", image: null };
         this.showCreateForm = false;
       } catch (error) {
-        console.error("Gagal menambah service:", error);
+        console.error("Gagal menambah service:", error.response?.data || error);
       }
     },
 
