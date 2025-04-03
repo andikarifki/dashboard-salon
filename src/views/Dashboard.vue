@@ -9,18 +9,19 @@
     
     <button @click="showCreateForm = true" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Tambah Service</button>
 
-    <!-- Modal Create Service -->
-    <div v-if="showCreateForm" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+   <!-- Modal Create Service -->
+   <div v-if="showCreateForm" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-white p-6 rounded shadow-lg w-96">
-    <h3 class="text-lg font-bold mb-4">Tambah Service Baru</h3>
-    <form @submit.prevent="addService">
-      <input v-model="newService.name" placeholder="Nama Service" class="border p-2 rounded w-full mb-2" required />
-      <input v-model="newService.description" placeholder="Deskripsi Service" class="border p-2 rounded w-full mb-2" required />
-      <input v-model="newService.price" placeholder="Harga Service" type="number" class="border p-2 rounded w-full mb-2" required />
-      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded w-full">Tambah Service</button>
-      <button @click="showCreateForm = false" type="button" class="bg-gray-500 text-white px-4 py-2 rounded w-full mt-2">Batal</button>
-    </form>
-  </div>
+        <h3 class="text-lg font-bold mb-4">Tambah Service Baru</h3>
+        <form @submit.prevent="addService">
+          <input v-model="newService.name" placeholder="Nama Service" class="border p-2 rounded w-full mb-2" required />
+          <input v-model="newService.description" placeholder="Deskripsi Service" class="border p-2 rounded w-full mb-2" required />
+          <input v-model="newService.price" placeholder="Harga Service" type="number" class="border p-2 rounded w-full mb-2" required />
+          <input type="file" @change="handleImageUpload" class="border p-2 rounded w-full mb-2" />
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded w-full">Tambah Service</button>
+          <button @click="showCreateForm = false" type="button" class="bg-gray-500 text-white px-4 py-2 rounded w-full mt-2">Batal</button>
+        </form>
+      </div>
     </div>
 
     <!-- Tabel Services -->
@@ -53,7 +54,7 @@
       <div class="bg-white p-6 rounded shadow-lg w-96 text-center">
         <h3 class="text-lg font-bold mb-4">Edit Service</h3>
         <input v-model="editingService.name" placeholder="Nama Service" class="border p-2 rounded w-full mb-2" />
-        <input v-model="editingService.description" placeholder="description" type="text" class="border p-2 rounded w-full mb-2" />
+        <input v-model="editingService.description" placeholder="Deskripsi Service" class="border p-2 rounded w-full mb-2" />
         <input v-model="editingService.price" placeholder="Harga Service" type="number" class="border p-2 rounded w-full mb-2" />
         <button @click="updateService" class="bg-green-500 text-white px-4 py-2 rounded">Update</button>
         <button @click="editingService = null" class="bg-gray-400 text-white px-4 py-2 rounded ml-2">Batal</button>
@@ -70,9 +71,9 @@ export default {
     return {
       user: {},
       services: [],
-      newService: { name: "", description: "", price: "" },
+      newService: { name: "", description: "", price: "", image: null },
       editingService: null,
-      showCreateForm: false, // Menyimpan status apakah form create service terlihat atau tidak
+      showCreateForm: false,
     };
   },
   async created() {
@@ -111,41 +112,66 @@ export default {
       }
     },
 
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.newService.image = file;
+      }
+    },
+
     async addService() {
       try {
-        const response = await axios.post("/services", this.newService, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        const formData = new FormData();
+        formData.append("name", this.newService.name);
+        formData.append("description", this.newService.description);
+        formData.append("price", this.newService.price);
+        if (this.newService.image) {
+          formData.append("image", this.newService.image);
+        }
+
+        const response = await axios.post("/services", formData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
+          },
         });
         this.services.push(response.data);
-        this.newService = { name: "", description: "", price: "" };
-        this.showCreateForm = false; // Setelah berhasil menambahkan, sembunyikan form
+        this.newService = { name: "", description: "", price: "", image: null };
+        this.showCreateForm = false;
       } catch (error) {
         console.error("Gagal menambah service:", error);
       }
     },
 
-    toggleCreateForm() {
-      this.showCreateForm = !this.showCreateForm;
-    },
-
     editService(service) {
-      this.editingService = { ...service };
-    },
+  console.log("Editing service:", service);
+  this.editingService = { ...service };
+},
 
-    async updateService() {
-      try {
-        await axios.put(`/services/${this.editingService.id}`, this.editingService, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        this.fetchServices();
-        this.editingService = null;
-      } catch (error) {
-        console.error("Gagal mengupdate service:", error.response?.data || error.message);
-        alert("Error: " + JSON.stringify(error.response?.data));
-      }
-    },
+async updateService() {
+  try {
+    const response = await axios.put(`/services/${this.editingService.id}`, {
+      name: this.editingService.name,
+      description: this.editingService.description,
+      price: this.editingService.price
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
 
-    async deleteService(id) {
+    // Perbarui data di array tanpa menghapus tampilan lainnya
+    const index = this.services.findIndex(service => service.id === this.editingService.id);
+    if (index !== -1) {
+      this.services[index] = { ...this.editingService }; // Memastikan data yang diedit tetap ada
+    }
+
+    // Tutup modal edit
+    this.editingService = null;
+  } catch (error) {
+    console.error("Gagal mengupdate service:", error);
+  }
+},
+
+  async deleteService(id) {
       if (!confirm("Yakin ingin menghapus service ini?")) return;
       try {
         await axios.delete(`/services/${id}`, {
@@ -159,7 +185,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Tambahkan style tambahan jika perlu */
-</style>
