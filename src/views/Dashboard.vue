@@ -65,6 +65,15 @@
           class="border p-2 rounded w-full mb-2" />
         <input v-model="editingService.price" placeholder="Harga Service" type="number"
           class="border p-2 rounded w-full mb-2" />
+
+        <!-- Tampilkan gambar yang ada -->
+        <div v-if="editingService.image">
+          <img :src="editingService.image" alt="Current Image" class="mt-4 w-full h-auto" />
+        </div>
+
+        <!-- Input untuk mengunggah gambar baru -->
+        <input type="file" @change="handleEditImageUpload" class="border p-2 rounded w-full mb-2" />
+
         <button @click="updateService" class="bg-green-500 text-white px-4 py-2 rounded">Update</button>
         <button @click="editingService = null" class="bg-gray-400 text-white px-4 py-2 rounded ml-2">Batal</button>
       </div>
@@ -184,30 +193,43 @@ export default {
       }
     },
 
+    handleEditImageUpload(event) {
+      const file = event.target.files[0];
+      this.editingService.newImage = file; // Simpan file baru
+      console.log("File yang dipilih untuk edit:", file);
+    },
+
+
     editService(service) {
       this.editingService = { ...service };
     },
 
     async updateService() {
       try {
-        const response = await axios.put(`/services/${this.editingService.id}`, {
-          name: this.editingService.name,
-          description: this.editingService.description,
-          price: this.editingService.price
-        }, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const formData = new FormData();
+        formData.append("name", this.editingService.name);
+        formData.append("description", this.editingService.description);
+        formData.append("price", this.editingService.price);
 
-        // Perbarui data di array tanpa menghapus tampilan lainnya
-        const index = this.services.findIndex(service => service.id === this.editingService.id);
-        if (index !== -1) {
-          this.services[index] = { ...this.editingService };
+        if (this.editingService.newImage) {
+          formData.append("image", this.editingService.newImage);
         }
 
-        // Tutup modal edit
+        const response = await axios.post(`/services/${this.editingService.id}?_method=PUT`, formData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        const index = this.services.findIndex(service => service.id === this.editingService.id);
+        if (index !== -1) {
+          this.services[index] = { ...response.data };
+        }
+
         this.editingService = null;
       } catch (error) {
-        console.error("Gagal mengupdate service:", error);
+        console.error("Gagal mengupdate service:", error.response?.data || error);
       }
     },
 
