@@ -66,11 +66,6 @@
         <input v-model="editingService.price" placeholder="Harga Service" type="number"
           class="border p-2 rounded w-full mb-2" />
 
-        <!-- Tampilkan gambar yang ada -->
-        <div v-if="editingService.image">
-          <img :src="editingService.image" alt="Current Image" class="mt-4 w-full h-auto" />
-        </div>
-
         <!-- Input untuk mengunggah gambar baru -->
         <input type="file" @change="handleEditImageUpload" class="border p-2 rounded w-full mb-2" />
 
@@ -210,10 +205,7 @@ export default {
         formData.append("name", this.editingService.name);
         formData.append("description", this.editingService.description);
         formData.append("price", this.editingService.price);
-
-        if (this.editingService.newImage) {
-          formData.append("image", this.editingService.newImage);
-        }
+        formData.append("image", this.editingService.newImage);
 
         const response = await axios.post(`/services/${this.editingService.id}?_method=PUT`, formData, {
           headers: {
