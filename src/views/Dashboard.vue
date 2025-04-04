@@ -2,34 +2,14 @@
   <div class="flex h-screen">
     <Sidebar />
     <div class="flex-1 p-6 flex flex-col">
-      <div class="flex justify-between items-center mb-4">
-        <div>
-          <h2 class="text-2xl font-bold">Dashboard</h2>
-          <p class="text-lg">Selamat datang, {{ user.name }}!</p>
-        </div>
-        <button @click="logout" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
-      </div>
+      <h2 class="text-2xl font-bold">Dashboard</h2>
+
+      <Header :user="user" @logout="logout" />
 
       <button @click="showCreateForm = true" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Tambah
         Service</button>
 
-      <div v-if="showCreateForm" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white p-6 rounded shadow-lg w-96">
-          <h3 class="text-lg font-bold mb-4">Tambah Service Baru</h3>
-          <form @submit.prevent="addService">
-            <input v-model="newService.name" placeholder="Nama Service" class="border p-2 rounded w-full mb-2"
-              required />
-            <input v-model="newService.description" placeholder="Deskripsi Service"
-              class="border p-2 rounded w-full mb-2" required />
-            <input v-model="newService.price" placeholder="Harga Service" type="number"
-              class="border p-2 rounded w-full mb-2" required />
-            <input type="file" @change="handleImageUpload" class="border p-2 rounded w-full mb-2" />
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded w-full">Tambah Service</button>
-            <button @click="showCreateForm = false" type="button"
-              class="bg-gray-500 text-white px-4 py-2 rounded w-full mt-2">Batal</button>
-          </form>
-        </div>
-      </div>
+      <CreateServiceForm v-if="showCreateForm" @close="showCreateForm = false" @serviceAdded="addServiceToList" />
 
       <div class="overflow-x-auto mt-6">
         <table class="min-w-full table-auto border-collapse border border-gray-200">
@@ -94,16 +74,19 @@
 <script>
 import axios from "axios";
 import Sidebar from "../components/Sidebar.vue";
+import CreateServiceForm from "../components/CreateServiceForm.vue"; // Import CreateServiceForm
+import Header from "../components/Header.vue";
 
 export default {
   components: {
-    Sidebar, // Daftarkan komponen Sidebar agar dapat digunakan di template
+    Sidebar,
+    CreateServiceForm, // Daftarkan CreateServiceForm
+    Header
   },
   data() {
     return {
       user: {},
       services: [],
-      newService: { name: "", description: "", price: "", image: null },
       editingService: null,
       showCreateForm: false,
       showDetail: false,
@@ -159,36 +142,8 @@ export default {
       this.$router.push("/login");
     },
 
-    handleImageUpload(event) {
-      const file = event.target.files[0];
-      this.newService.image = file;
-      console.log("File dipilih:", file);
-    },
-
-    async addService() {
-      try {
-        const formData = new FormData();
-        formData.append("name", this.newService.name);
-        formData.append("description", this.newService.description);
-        formData.append("price", this.newService.price);
-
-        if (this.newService.image) {
-          formData.append("image", this.newService.image);
-        }
-
-        const response = await axios.post("/services", formData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        this.services.push(response.data);
-        this.newService = { name: "", description: "", price: "", image: null };
-        this.showCreateForm = false;
-      } catch (error) {
-        console.error("Gagal menambah service:", error.response?.data || error);
-      }
+    addServiceToList(newServiceData) {
+      this.services.push(newServiceData);
     },
 
     handleEditImageUpload(event) {
