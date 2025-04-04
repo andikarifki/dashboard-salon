@@ -1,12 +1,28 @@
 <template>
-  <div class="container">
-    <h2>Login</h2>
-    <form @submit.prevent="login">
-      <input type="email" v-model="email" placeholder="Email" required />
-      <input type="password" v-model="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-    <p>Belum punya akun? <router-link to="/register">Daftar</router-link></p>
+  <div class="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Login</h2>
+      <form @submit.prevent="login">
+        <div class="mb-4">
+          <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+          <input type="email" id="email" v-model="email"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Masukkan email Anda" required />
+        </div>
+        <div class="mb-6">
+          <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+          <input type="password" id="password" v-model="password"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Masukkan password Anda" required />
+        </div>
+        <div class="flex items-center justify-between">
+          <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Login
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -33,6 +49,7 @@ export default {
         this.$router.push("/dashboard");
       } catch (error) {
         alert("Login gagal! Periksa email dan password.");
+        console.error("Login error:", error.response?.data || error); // Tambahkan logging error
       }
     },
   },
@@ -40,14 +57,5 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  max-width: 300px;
-  margin: 50px auto;
-  text-align: center;
-}
-input, button {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-}
+/* Gaya yang sudah ada bisa dihapus karena kita menggunakan Tailwind */
 </style>
