@@ -49,7 +49,10 @@
                     <input v-model="editingService.price" placeholder="Harga Service" type="number"
                         class="border p-2 rounded w-full mb-2" />
 
-                    <input type="file" @change="handleEditImageUpload" class="border p-2 rounded w-full mb-2" />
+                    <input type="file" @change="handleEditImageUpload" class="border p-2 rounded w-full mb-2"
+                        accept="image/*" />
+                    <img v-if="editImagePreview" :src="editImagePreview" alt="Pratinjau Gambar"
+                        class="mt-2 max-h-40 w-auto" />
 
                     <button @click="updateService" class="bg-green-500 text-white px-4 py-2 rounded">Update</button>
                     <button @click="editingService = null"
@@ -95,6 +98,7 @@ export default {
             showCreateForm: false,
             showDetail: false,
             currentService: null,
+            editImagePreview: null, // Tambahkan properti ini
         };
     },
     async created() {
@@ -154,10 +158,21 @@ export default {
             const file = event.target.files[0];
             this.editingService.newImage = file; // Simpan file baru
             console.log("File yang dipilih untuk edit:", file);
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.editImagePreview = e.target.result; // Set URL pratinjau
+                };
+                reader.readAsDataURL(file); // Baca file sebagai URL data
+            } else {
+                this.editImagePreview = null; // Hapus pratinjau jika tidak ada file dipilih
+            }
         },
 
         editService(service) {
             this.editingService = { ...service };
+            this.editImagePreview = service.image || null; // Set pratinjau awal
         },
 
         async updateService() {
