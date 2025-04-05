@@ -65,6 +65,10 @@
                                 <td class="py-2 px-4 font-semibold text-left w-28">Harga:</td>
                                 <td class="py-2 px-4 text-left">Rp{{ currentService?.price }}</td>
                             </tr>
+                            <tr>
+                                <td class="py-2 px-4 font-semibold text-left w-28">Jenis Layanan:</td>
+                                <td class="py-2 px-4 text-left">{{ currentService?.type_service.name }}</td>
+                            </tr>
                         </tbody>
                     </table>
                     <button @click="showDetail = false"
