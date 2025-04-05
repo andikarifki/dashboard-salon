@@ -9,6 +9,9 @@
                 <router-link to="/services" class="block hover:bg-gray-700 p-2 rounded">Services</router-link>
             </li>
             <li class="mb-2">
+                <router-link to="/type-services" class="block hover:bg-gray-700 p-2 rounded">Type Services</router-link>
+            </li>
+            <li class="mb-2">
                 <router-link to="/user" class="block hover:bg-gray-700 p-2 rounded">Users</router-link>
             </li>
         </ul>

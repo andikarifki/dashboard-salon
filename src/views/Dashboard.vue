@@ -2,10 +2,10 @@
   <div class="flex h-screen">
     <Sidebar />
     <div class="flex-1 p-6 flex flex-col">
-      <h2 class="text-2xl font-bold">Dashboard</h2>
-
       <Header :user="user" @logout="logout" />
 
+      <h2 class="text-2xl font-bold">Dashboard</h2>
+      <p class="text-lg">Selamat datang, {{ user.name }}!</p>
       <div class="overflow-x-auto mt-6">
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="bg-white shadow rounded-lg p-6">
@@ -47,19 +47,6 @@ export default {
       localStorage.removeItem("token");
       this.$router.push("/login");
     }
-  },
-  methods: {
-    async logout() {
-      try {
-        await axios.post("/user/logout", {}, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
-      localStorage.removeItem("token");
-      this.$router.push("/login");
-    },
   },
 };
 </script>

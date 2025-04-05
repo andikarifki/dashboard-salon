@@ -2,14 +2,15 @@
     <div class="flex h-screen">
         <Sidebar />
         <div class="flex-1 p-6 flex flex-col">
-            <h2 class="text-2xl font-bold">Dashboard</h2>
-
             <Header :user="user" @logout="logout" />
 
-            <button @click="showCreateForm = true" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Tambah
-                Service</button>
+            <h2 class="text-2xl font-bold">Services </h2>
 
-            <CreateServiceForm v-if="showCreateForm" @close="showCreateForm = false" @serviceAdded="addServiceToList" />
+
+            <router-link to="/services/create"
+                class="bg-blue-500 text-white text-center px-2 py-1 rounded mt-4 inline-block max-w-20">
+                Tambah
+            </router-link>
 
             <div class="overflow-x-auto mt-6">
                 <table class="min-w-full table-auto border-collapse border border-gray-200">
@@ -18,17 +19,19 @@
                             <th class="border-b px-4 py-2">Nama Service</th>
                             <th class="border-b px-4 py-2">Deskripsi</th>
                             <th class="border-b px-4 py-2">Harga</th>
-                            <th class="border-b px-4 py-2">Aksi</th>
+                            <th class="border-b px-4 py-2">Jenis Layanan</th>
+                            <th class="border-b px-4 py-2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="service in services" :key="service.id">
                             <td class="border-b px-4 py-2">{{ service.name }}</td>
-                            <td class="border-b px-4 py-2">{{ service.description }}</td>
-                            <td class="border-b px-4 py-2">Rp{{ service.price }}</td>
-                            <td class="border-b px-4 py-2">
-                                <button @click="editService(service)"
-                                    class="bg-yellow-500 text-white px-3 py-1 rounded mr-2">Edit</button>
+                            <td class="border-b px-4 py-2 break-words">{{ service.description }}</td>
+                            <td class="border-b px-4 py-2">Rp {{ service.price }}</td>
+                            <td class="border-b px-4 py-2">{{ service.type_service.name }}</td>
+                            <td class="border-b px-4 py-2 text-center ">
+                                <router-link :to="`/services/edit/${service.id}`"
+                                    class="bg-yellow-500 text-white px-3 py-1 rounded mr-2">Edit</router-link>
                                 <button @click="deleteService(service.id)"
                                     class="bg-red-500 text-white px-3 py-1 rounded mr-2">Hapus</button>
                                 <button @click="viewServiceDetail(service)"
@@ -39,27 +42,6 @@
                 </table>
             </div>
 
-            <div v-if="editingService" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white p-6 rounded shadow-lg w-96 text-center">
-                    <h3 class="text-lg font-bold mb-4">Edit Service</h3>
-                    <input v-model="editingService.name" placeholder="Nama Service"
-                        class="border p-2 rounded w-full mb-2" />
-                    <input v-model="editingService.description" placeholder="Deskripsi Service"
-                        class="border p-2 rounded w-full mb-2" />
-                    <input v-model="editingService.price" placeholder="Harga Service" type="number"
-                        class="border p-2 rounded w-full mb-2" />
-
-                    <input type="file" @change="handleEditImageUpload" class="border p-2 rounded w-full mb-2"
-                        accept="image/*" />
-                    <img v-if="editImagePreview" :src="editImagePreview" alt="Pratinjau Gambar"
-                        class="mt-2 max-h-40 w-auto" />
-
-                    <button @click="updateService" class="bg-green-500 text-white px-4 py-2 rounded">Update</button>
-                    <button @click="editingService = null"
-                        class="bg-gray-400 text-white px-4 py-2 rounded ml-2">Batal</button>
-                </div>
-            </div>
-
             <div v-if="showDetail" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                 <div class="bg-white p-6 rounded shadow-lg w-96 text-center">
                     <h3 class="text-lg font-bold mb-4">Detail Service</h3>
@@ -67,11 +49,26 @@
                         <img v-if="currentService.image" :src="currentService.image" alt="Image"
                             class="mt-4 w-full h-auto" />
                     </div>
-                    <p><strong>Nama Service:</strong> {{ currentService.name }}</p>
-                    <p><strong>Deskripsi:</strong> {{ currentService.description }}</p>
-                    <p><strong>Harga:</strong> Rp{{ currentService.price }}</p>
+                    <table class="mt-4 w-full">
+                        <tbody>
+                            <tr>
+                                <td class="py-2 px-4 font-semibold text-left w-32">Nama Service:</td>
+                                <td class="py-2 px-4 text-left">{{ currentService?.name }}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="py-2 px-4 font-semibold text-left w-40">Deskripsi:</td>
+                                <td class="py-2 px-4 text-left">{{ currentService?.description }}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="py-2 px-4 font-semibold text-left w-28">Harga:</td>
+                                <td class="py-2 px-4 text-left">Rp{{ currentService?.price }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <button @click="showDetail = false"
-                        class="bg-gray-400 text-white px-4 py-2 rounded ml-2">Tutup</button>
+                        class="bg-gray-400 text-white px-4 py-2 rounded ml-2 mt-2">Tutup</button>
                 </div>
             </div>
         </div>
@@ -81,24 +78,19 @@
 <script>
 import axios from "axios";
 import Sidebar from "../components/Sidebar.vue";
-import CreateServiceForm from "../components/CreateServiceForm.vue"; // Import CreateServiceForm
 import Header from "../components/Header.vue";
 
 export default {
     components: {
         Sidebar,
-        CreateServiceForm, // Daftarkan CreateServiceForm
-        Header
+        Header,
     },
     data() {
         return {
             user: {},
             services: [],
-            editingService: null,
-            showCreateForm: false,
             showDetail: false,
             currentService: null,
-            editImagePreview: null, // Tambahkan properti ini
         };
     },
     async created() {
@@ -135,69 +127,6 @@ export default {
                 console.log("Gambar yang diterima:", this.currentService.image);
             } catch (error) {
                 console.error("Gagal mengambil detail service:", error);
-            }
-        },
-
-        async logout() {
-            try {
-                await axios.post("/user/logout", {}, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                });
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
-            localStorage.removeItem("token");
-            this.$router.push("/login");
-        },
-
-        addServiceToList(newServiceData) {
-            this.services.push(newServiceData);
-        },
-
-        handleEditImageUpload(event) {
-            const file = event.target.files[0];
-            this.editingService.newImage = file; // Simpan file baru
-            console.log("File yang dipilih untuk edit:", file);
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.editImagePreview = e.target.result; // Set URL pratinjau
-                };
-                reader.readAsDataURL(file); // Baca file sebagai URL data
-            } else {
-                this.editImagePreview = null; // Hapus pratinjau jika tidak ada file dipilih
-            }
-        },
-
-        editService(service) {
-            this.editingService = { ...service };
-            this.editImagePreview = service.image || null; // Set pratinjau awal
-        },
-
-        async updateService() {
-            try {
-                const formData = new FormData();
-                formData.append("name", this.editingService.name);
-                formData.append("description", this.editingService.description);
-                formData.append("price", this.editingService.price);
-                formData.append("image", this.editingService.newImage);
-
-                const response = await axios.post(`/services/${this.editingService.id}?_method=PUT`, formData, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                });
-
-                const index = this.services.findIndex(service => service.id === this.editingService.id);
-                if (index !== -1) {
-                    this.services[index] = { ...response.data };
-                }
-
-                this.editingService = null;
-            } catch (error) {
-                console.error("Gagal mengupdate service:", error.response?.data || error);
             }
         },
 
