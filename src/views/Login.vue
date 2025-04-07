@@ -28,6 +28,7 @@
 
 <script>
 import axios from "axios";
+import { useRouter } from 'vue-router';
 
 export default {
   data() {
@@ -36,20 +37,34 @@ export default {
       password: "",
     };
   },
+  setup() {
+    const router = useRouter();
+    return { router };
+  },
   methods: {
     async login() {
       try {
-        const response = await axios.post("/user/login", {
+        const response = await axios.post("/user/login", { // Pastikan endpoint API Anda benar
           email: this.email,
           password: this.password,
         });
 
         localStorage.setItem("token", response.data.token);
         axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-        this.$router.push("/dashboard");
+
+        // Contoh yang benar (seharusnya sudah ada di kode Anda):
+        if (response.data.user && response.data.user.role) {
+          localStorage.setItem("userRole", response.data.user.role);
+          this.router.push("/dashboard");
+        } else {
+          console.warn("Respons login tidak menyertakan informasi role pengguna.");
+          localStorage.setItem("userRole", 'guest'); // Set default jika tidak ada role
+          this.router.push("/dashboard");
+        }
+
       } catch (error) {
         alert("Login gagal! Periksa email dan password.");
-        console.error("Login error:", error.response?.data || error); // Tambahkan logging error
+        console.error("Login error:", error.response?.data || error);
       }
     },
   },
