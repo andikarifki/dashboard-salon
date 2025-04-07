@@ -17,6 +17,7 @@
                         <tr class="bg-gray-100">
                             <th class="border-b px-4 py-2 text-center">Nama</th>
                             <th class="border-b px-4 py-2 text-center">Email</th>
+                            <th class="border-b px-4 py-2 text-center">Role</th>
                             <th class="border-b px-4 py-2 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -24,6 +25,7 @@
                         <tr v-for="user in users" :key="user.id">
                             <td class="border-b px-4 py-2 text-center">{{ user.name }}</td>
                             <td class="border-b px-4 py-2 text-center">{{ user.email }}</td>
+                            <td class="border-b px-4 py-2 text-center">{{ user.role }}</td>
                             <td class="border-b px-4 py-2 text-center">
                                 <button v-if="user.name !== 'admin'" @click="deleteUser(user.id)"
                                     class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -67,10 +69,10 @@ export default {
                 const response = await axios.get('http://localhost:8000/api/users');
                 let usersData = response.data;
                 usersData.sort((a, b) => {
-                    if (a.name === 'admin' && b.name !== 'admin') {
+                    if (a.role === 'admin' && b.role !== 'admin') {
                         return -1; // a (admin) harus lebih dulu
                     }
-                    if (a.name !== 'admin' && b.name === 'admin') {
+                    if (a.role !== 'admin' && b.role === 'admin') {
                         return 1;  // b (admin) harus lebih dulu
                     }
                     return 0;      // Urutan relatif a dan b tidak berubah jika keduanya admin atau bukan admin
