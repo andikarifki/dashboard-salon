@@ -8,18 +8,38 @@ import CreateService from "../pages/CreateService.vue";
 import EditService from "../pages/EditService.vue";
 import TypeServices from "../views/TypeServices.vue";
 import CreateTypeService from "../pages/TypeServicesCreate.vue";
+import Salon from "../views/salon/Salon.vue";
 
 const routes = [
-  { path: "/", redirect: "/login" },
-  { path: "/login", name: "Login", component: Login },
-  { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true }, roles: ['admin'] },
-  { path: "/register", component: Register },
+  {
+    path: "/",
+    redirect: "/login",
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login,
+  },
+  {
+    path: "/dashboard",
+    component: Dashboard,
+    meta: { requiresAuth: true },
+    roles: ["admin"],
+  },
+  {
+    path: "/register",
+    component: Register,
+  },
   {
     path: "/user",
     component: User,
-    meta: { requiresAuth: true, roles: ['admin'] }, // Hanya admin yang boleh akses
+    meta: { requiresAuth: true, roles: ["admin"] }, // Hanya admin yang boleh akses
   },
-  { path: "/services", component: Services, meta: { requiresAuth: true } },
+  {
+    path: "/services",
+    component: Services,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/type-services",
     name: "TypeServices",
@@ -44,6 +64,13 @@ const routes = [
     component: EditService,
     meta: { requiresAuth: true },
   },
+
+  //frontend salon
+  {
+    path: "/salon",
+    name: "Salon",
+    component: Salon,
+  },
 ];
 
 const router = createRouter({
@@ -53,13 +80,13 @@ const router = createRouter({
 
 // Di router.beforeEach
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole'); // Asumsi peran disimpan di localStorage
+  const isAuthenticated = localStorage.getItem("token");
+  const userRole = localStorage.getItem("userRole"); // Asumsi peran disimpan di localStorage
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login');
+    next("/login");
   } else if (to.meta.roles && !to.meta.roles.includes(userRole)) {
-    next('/dashboard'); // Arahkan ke halaman "Akses Ditolak"
+    next("/dashboard"); // Arahkan ke halaman "Akses Ditolak"
   } else {
     next();
   }
