@@ -11,11 +11,15 @@ import CreateTypeService from "../pages/TypeServicesCreate.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },
-  { path: "/login", component: Login },
-  { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/login", name: "Login", component: Login },
+  { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true }, roles: ['admin'] },
   { path: "/register", component: Register },
-  { path: "/user", component: User },
-  { path: "/services", component: Services },
+  {
+    path: "/user",
+    component: User,
+    meta: { requiresAuth: true, roles: ['admin'] }, // Hanya admin yang boleh akses
+  },
+  { path: "/services", component: Services, meta: { requiresAuth: true } },
   {
     path: "/type-services",
     name: "TypeServices",
@@ -47,12 +51,15 @@ const router = createRouter({
   routes,
 });
 
+// Di router.beforeEach
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem("token");
+  const isAuthenticated = localStorage.getItem('token');
+  const userRole = localStorage.getItem('userRole'); // Asumsi peran disimpan di localStorage
+
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next("/login");
-  } else if (!to.meta.requiresAuth && isAuthenticated && to.name === "Login") {
-    next("/services");
+    next('/login');
+  } else if (to.meta.roles && !to.meta.roles.includes(userRole)) {
+    next('/dashboard'); // Arahkan ke halaman "Akses Ditolak"
   } else {
     next();
   }
