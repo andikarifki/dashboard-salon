@@ -74,7 +74,7 @@
               style="max-height: 600px" />
           </div>
 
-          <table class="mt-6 w-full text-base">
+          <table class="mt-6 w-full text-base" style="table-layout: fixed;">
             <tbody>
               <tr>
                 <td class="py-3 px-4 font-semibold text-left w-36">Nama Service:</td>
@@ -83,7 +83,7 @@
 
               <tr>
                 <td class="py-3 px-4 font-semibold text-left w-48">Deskripsi:</td>
-                <td class="py-3 px-4 text-left">{{ currentService?.description }}</td>
+                <td class="py-3 px-4 text-left break-words whitespace-normal">{{ currentService?.description }}</td>
               </tr>
 
               <tr>

@@ -8,7 +8,8 @@
             <div class="bg-white p-6 rounded shadow-md mt-4">
                 <input v-model="newService.name" placeholder="Nama Service" class="border p-2 rounded w-full mb-2" />
                 <textarea v-model="newService.description" placeholder="Deskripsi Service"
-                    class="border p-2 rounded w-full mb-2"></textarea>
+                    class="border p-2 rounded w-full mb-2" maxlength="255" // Batasi hingga 255 karakter (sesuaikan
+                    sesuai kebutuhan)></textarea>
                 <input v-model="newService.price" placeholder="Harga Service" type="number"
                     class="border p-2 rounded w-full mb-2" />
                 <select v-model="newService.id_type" class="border p-2 rounded w-full mb-2">
