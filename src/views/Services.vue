@@ -12,39 +12,61 @@
       >
         Tambah
       </router-link>
-
+      <div class="mt-4 flex items-center gap-2">
+        <label for="typeFilter" class="text-sm font-medium">Filter Jenis:</label>
+        <select
+          id="typeFilter"
+          v-model="selectedTypeId"
+          @change="fetchFilteredServices"
+          class="border border-gray-300 px-2 py-1 rounded text-sm"
+        >
+          <option value="">Semua</option>
+          <option v-for="type in typeServices" :key="type.id" :value="type.id">
+            {{ type.name }}
+          </option>
+        </select>
+      </div>
       <div class="overflow-x-auto mt-6">
-        <table class="min-w-full table-auto border-collapse border border-gray-200">
+        <table
+          class="min-w-full table-fixed border-collapse border border-gray-200 text-sm"
+        >
           <thead>
             <tr class="bg-gray-100">
-              <th class="border-b px-4 py-2">Nama Service</th>
-              <th class="border-b px-4 py-2">Deskripsi</th>
-              <th class="border-b px-4 py-2">Harga</th>
-              <th class="border-b px-4 py-2">Jenis Layanan</th>
-              <th class="border-b px-4 py-2">Action</th>
+              <th class="border-b px-2 py-1 w-28">Nama</th>
+              <th class="border-b px-2 py-1 w-48">Deskripsi</th>
+              <th class="border-b px-2 py-1 w-20">Harga</th>
+              <th class="border-b px-2 py-1 w-28">Jenis</th>
+              <th class="border-b px-2 py-1 w-44">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="service in services" :key="service.id">
-              <td class="border-b px-4 py-2">{{ service.name }}</td>
-              <td class="border-b px-4 py-2 break-words">{{ service.description }}</td>
-              <td class="border-b px-4 py-2">Rp {{ service.price }}</td>
-              <td class="border-b px-4 py-2">{{ service.type_service.name }}</td>
-              <td class="border-b px-4 py-2 text-center">
+              <td class="border-b px-2 py-1 truncate" :title="service.name">
+                {{ service.name }}
+              </td>
+              <td class="border-b px-2 py-1 break-words whitespace-normal">
+                {{ service.description }}
+              </td>
+              <td class="border-b px-2 py-1">Rp {{ service.price }}</td>
+              <td class="border-b px-2 py-1 truncate" :title="service.type_service.name">
+                {{ service.type_service.name }}
+              </td>
+              <td class="border-b px-2 py-1 text-center space-x-1">
                 <router-link
                   :to="`/services/edit/${service.id}`"
-                  class="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
-                  >Edit</router-link
+                  class="bg-yellow-500 text-white px-2 py-0.5 rounded text-xs"
                 >
+                  Edit
+                </router-link>
                 <button
                   @click="deleteService(service.id)"
-                  class="bg-red-500 text-white px-3 py-1 rounded mr-2"
+                  class="bg-red-500 text-white px-2 py-0.5 rounded text-xs"
                 >
                   Hapus
                 </button>
                 <button
                   @click="viewServiceDetail(service)"
-                  class="bg-blue-500 text-white px-3 py-1 rounded"
+                  class="bg-blue-500 text-white px-2 py-0.5 rounded text-xs"
                 >
                   Detail
                 </button>

@@ -70,16 +70,32 @@ export default {
         }
     },
     methods: {
-        async fetchTypeServices() {
-            try {
-                const response = await axios.get("/type-services", {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                });
-                this.typeServices = response.data;
-            } catch (error) {
-                console.error("Gagal mengambil data jenis layanan:", error);
-            }
-        },
+       async fetchTypeServices() {
+  try {
+    const response = await axios.get("/type-services", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    this.typeServices = response.data;
+  } catch (error) {
+    console.error("Gagal mengambil data jenis layanan:", error);
+  }
+},
+
+async fetchFilteredServices() {
+  try {
+    let url = "/services";
+    if (this.selectedTypeId) {
+      url = `/services/type/${this.selectedTypeId}`;
+    }
+    const response = await axios.get(url, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    this.services = response.data;
+  } catch (error) {
+    console.error("Gagal memfilter services:", error);
+  }
+},
+
         async deleteTypeService(id) {
             if (!confirm("Yakin ingin menghapus jenis layanan ini?")) return;
             try {
