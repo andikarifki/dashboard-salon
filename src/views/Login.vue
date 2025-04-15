@@ -11,15 +11,12 @@
         </div>
         <div class="mb-6 relative">
           <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-          <input
-            :type="passwordFieldType"
-            id="password"
-            v-model="password"
+          <input :type="passwordFieldType" id="password" v-model="password"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10"
-            placeholder="Masukkan password Anda"
-            required
-          />
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer" @click="togglePasswordVisibility">
+            placeholder="Masukkan password Anda" required />
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+            style="display: flex; align-items: center; top: 75%; transform: translateY(-50%);"
+            @click="togglePasswordVisibility">
             <i v-if="passwordFieldType === 'password'" class="fas fa-eye h-5 w-5"></i>
             <i v-else class="fas fa-eye-slash h-5 w-5"></i>
           </div>
