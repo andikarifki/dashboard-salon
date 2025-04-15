@@ -9,11 +9,20 @@
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Masukkan email Anda" required />
         </div>
-        <div class="mb-6">
+        <div class="mb-6 relative">
           <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-          <input type="password" id="password" v-model="password"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Masukkan password Anda" required />
+          <input
+            :type="passwordFieldType"
+            id="password"
+            v-model="password"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10"
+            placeholder="Masukkan password Anda"
+            required
+          />
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer" @click="togglePasswordVisibility">
+            <i v-if="passwordFieldType === 'password'" class="fas fa-eye h-5 w-5"></i>
+            <i v-else class="fas fa-eye-slash h-5 w-5"></i>
+          </div>
         </div>
         <div class="flex items-center justify-between">
           <button type="submit"
@@ -35,6 +44,7 @@ export default {
     return {
       email: "",
       password: "",
+      passwordFieldType: 'password',
     };
   },
   setup() {
@@ -44,7 +54,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post("/user/login", { // Pastikan endpoint API Anda benar
+        const response = await axios.post("/user/login", {
           email: this.email,
           password: this.password,
         });
@@ -52,13 +62,12 @@ export default {
         localStorage.setItem("token", response.data.token);
         axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
 
-        // Contoh yang benar (seharusnya sudah ada di kode Anda):
         if (response.data.user && response.data.user.role) {
           localStorage.setItem("userRole", response.data.user.role);
           this.router.push("/dashboard");
         } else {
           console.warn("Respons login tidak menyertakan informasi role pengguna.");
-          localStorage.setItem("userRole", 'guest'); // Set default jika tidak ada role
+          localStorage.setItem("userRole", 'guest');
           this.router.push("/dashboard");
         }
 
@@ -66,6 +75,9 @@ export default {
         alert("Login gagal! Periksa email dan password.");
         console.error("Login error:", error.response?.data || error);
       }
+    },
+    togglePasswordVisibility() {
+      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
     },
   },
 };
