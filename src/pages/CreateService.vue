@@ -17,7 +17,7 @@
                 </select>
                 <input type="file" @change="handleImageUpload" class="border p-2 rounded w-full mb-2"
                     accept="image/*" />
-                <img v-if="imagePreview" :src="imagePreview" alt="Pratinjau Gambar" class="mt-2 max-h-40 w-auto" />
+                <img v-if="imagePreview" :src="imagePreview" alt="Pratinjau Gambar" class="mt-2 max-h-40 w-auto mb-4" />
 
                 <button @click="submitForm" class="bg-green-500 text-white px-4 py-2 rounded">Simpan Service</button>
                 <button @click="$router.push('/services')"

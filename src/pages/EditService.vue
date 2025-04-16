@@ -22,9 +22,10 @@
 
                 <input type="file" @change="handleImageUpload" class="border p-2 rounded w-full mb-2"
                     accept="image/*" />
-                <img v-if="imagePreview" :src="imagePreview" alt="Pratinjau Gambar Baru" class="mt-2 max-h-40 w-auto" />
+                <img v-if="imagePreview" :src="imagePreview" alt="Pratinjau Gambar Baru"
+                    class="mt-2 max-h-40 w-auto mb-4" />
                 <img v-else-if="editingService.image" :src="editingService.image" alt="Gambar Saat Ini"
-                    class="mt-2 max-h-40 w-auto" />
+                    class="mt-2 max-h-40 w-auto mb-4" />
 
                 <button @click="updateService" class="bg-green-500 text-white px-4 py-2 rounded">Update Service</button>
                 <button @click="$router.push('/services')"
@@ -125,18 +126,6 @@ export default {
                 console.error("Gagal mengupdate service:", error.response?.data || error);
                 this.formError = 'Terjadi kesalahan saat mengupdate service.';
             }
-        },
-
-        async logout() {
-            try {
-                await axios.post("/user/logout", {}, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                });
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
-            localStorage.removeItem("token");
-            this.$router.push("/login");
         },
     },
 };
