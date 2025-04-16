@@ -29,11 +29,11 @@
               <td class="border-b px-4 py-2 text-center">
                 <button v-if="user.name !== 'admin'" @click="openEditModal(user)"
                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">
-                  Edit
+                  <i class="fas fa-pen"></i>
                 </button>
                 <button v-if="user.name !== 'admin'" @click="deleteUser(user.id)"
                   class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                  Hapus
+                  <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
