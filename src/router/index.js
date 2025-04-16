@@ -3,6 +3,7 @@ import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Dashboard from "../views/Dashboard.vue";
 import Users from "../views/User.vue";
+import ProfileUser from "../views/Profile.vue";
 import Services from "../views/Services.vue";
 import CreateService from "../pages/CreateService.vue";
 import EditService from "../pages/EditService.vue";
@@ -34,6 +35,11 @@ const routes = [
     path: "/users",
     component: Users,
     meta: { requiresAuth: true, roles: ["admin"] }, // Hanya admin yang boleh akses
+  },
+  {
+    path: "/profile",
+    component: ProfileUser,
+    meta: { requiresAuth: true },
   },
   {
     path: "/services",
