@@ -52,13 +52,13 @@
               <td class="border-b px-3 py-2 text-center space-x-2">
                 <router-link :to="`/services/edit/${service.id}`"
                   class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">
-                  Edit
+                  <i class="fas fa-pen"></i>
                 </router-link>
                 <button @click="deleteService(service.id)" class="bg-red-500 text-white px-3 py-1 rounded text-sm">
-                  Hapus
+                  <i class="fas fa-trash-can"></i>
                 </button>
                 <button @click="viewServiceDetail(service)" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                  Detail
+                  <i class="fas fa-eye"></i>
                 </button>
               </td>
             </tr>
