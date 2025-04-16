@@ -81,7 +81,7 @@ export default {
         const response = await axios.post('http://localhost:8000/api/user/register', this.form);
         console.log('Registrasi berhasil:', response.data);
         alert('Akun berhasil ditambahkan!');
-        this.$router.push('/user'); // Redirect ke halaman daftar pengguna setelah berhasil
+        this.$router.push('/users'); // Redirect ke halaman daftar pengguna setelah berhasil
       } catch (error) {
         if (error.response && error.response.data && error.response.data.errors) {
           this.errors = error.response.data.errors;
