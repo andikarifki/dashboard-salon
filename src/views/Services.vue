@@ -111,8 +111,25 @@
                   </div>
                 </td>
               </tr>
+              <tr v-if="filteredServices.length === 0">
+                <td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500 text-center">
+                  Tidak ada data layanan.
+                </td>
+              </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="flex justify-center items-center mt-6">
+          <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)"
+            class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-l focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed">
+            Sebelumnya
+          </button>
+          <span class="text-gray-700 mx-3">Halaman {{ currentPage }} dari {{ totalPages }}</span>
+          <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)"
+            class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed">
+            Berikutnya
+          </button>
         </div>
       </div>
 
