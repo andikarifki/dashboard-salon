@@ -6,26 +6,29 @@
 
       <h2 class="text-2xl font-bold">Services</h2>
 
-      <router-link to="/services/create"
-        class="bg-blue-500 text-white text-center px-3 py-2 rounded mt-4 inline-block max-w-32">
-        Tambah
-      </router-link>
-      <div class="mt-4 flex items-center gap-3">
-        <label for="typeFilter" class="text-base font-medium">Filter Jenis:</label>
-        <select id="typeFilter" v-model="selectedTypeId" @change="fetchFilteredServices"
-          class="border border-gray-300 px-3 py-2 rounded text-base">
-          <option value="">Semua</option>
-          <option v-for="type in typeServices" :key="type.id" :value="type.id">
-            {{ type.name }}
-          </option>
-        </select>
+      <div class="flex justify-between items-center mb-4">
+        <router-link to="/services/create"
+          class="bg-blue-500 text-white text-center px-3 py-2 rounded inline-block max-w-32">
+          Tambah
+        </router-link>
+        <div class="flex items-center gap-3">
+          <label for="typeFilter" class="text-base font-medium">Filter Jenis:</label>
+          <select id="typeFilter" v-model="selectedTypeId" @change="fetchFilteredServices"
+            class="border border-gray-300 px-3 py-2 rounded text-base">
+            <option value="">Semua</option>
+            <option v-for="type in typeServices" :key="type.id" :value="type.id">
+              {{ type.name }}
+            </option>
+          </select>
+        </div>
+        <div class="flex items-center">
+          <label for="search" class="mr-3 text-base font-medium">Cari Layanan:</label>
+          <input type="text" id="search" v-model="searchQuery" @input="searchServices"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-base"
+            placeholder="Masukkan nama layanan" />
+        </div>
       </div>
-      <div class="mt-4 flex items-center">
-        <label for="search" class="mr-3 text-base font-medium">Cari Layanan:</label>
-        <input type="text" id="search" v-model="searchQuery" @input="searchServices"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-base"
-          placeholder="Masukkan nama layanan" />
-      </div>
+
       <div class="overflow-x-auto mt-8">
         <table class="min-w-full table-fixed border-collapse border border-gray-200 text-base">
           <thead>
@@ -38,7 +41,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="service in filteredServices" :key="service.id">
+            <tr v-for="service in paginatedServices" :key="service.id">
               <td class="border-b px-3 py-2 truncate" :title="service.name">
                 {{ service.name }}
               </td>
@@ -127,6 +130,8 @@ export default {
       searchQuery: "",
       showDetail: false,
       currentService: null,
+      perPage: 10, // Jumlah item per halaman
+      currentPage: 1,
     };
   },
   computed: {
@@ -136,6 +141,14 @@ export default {
         const searchFilter = !this.searchQuery || service.name.toLowerCase().includes(this.searchQuery.toLowerCase());
         return typeFilter && searchFilter;
       });
+    },
+    totalPages() {
+      return Math.ceil(this.filteredServices.length / this.perPage);
+    },
+    paginatedServices() {
+      const startIndex = (this.currentPage - 1) * this.perPage;
+      const endIndex = startIndex + this.perPage;
+      return this.filteredServices.slice(startIndex, endIndex);
     },
   },
   async created() {
@@ -158,6 +171,7 @@ export default {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         this.services = response.data;
+        this.currentPage = 1; // Reset ke halaman pertama setelah data baru dimuat
       } catch (error) {
         console.error("Gagal mengambil data services:", error);
       }
@@ -172,7 +186,6 @@ export default {
         console.error("Gagal mengambil data jenis layanan:", error);
       }
     },
-
     async viewServiceDetail(service) {
       try {
         const response = await axios.get(`/services/${service.id}`, {
@@ -192,8 +205,20 @@ export default {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         this.services = this.services.filter((service) => service.id !== id);
+        this.currentPage = 1; // Reset ke halaman pertama setelah menghapus
       } catch (error) {
         console.error("Gagal menghapus service:", error);
+      }
+    },
+    fetchFilteredServices() {
+      this.currentPage = 1; // Reset ke halaman pertama saat filter berubah
+    },
+    searchServices: debounce(function () {
+      this.currentPage = 1; // Reset ke halaman pertama saat pencarian berubah
+    }, 300),
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
       }
     },
   },
