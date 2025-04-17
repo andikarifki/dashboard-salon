@@ -42,6 +42,19 @@
                   placeholder="Cari nama layanan..." />
               </div>
             </div>
+
+            <div>
+              <label for="priceSort" class="block text-gray-700 text-sm font-bold mb-2">Urutkan Harga:</label>
+              <select id="priceSort" v-model="priceSortOrder" @change="applyPriceSort"
+                class="block appearance-none w-full bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline text-sm">
+                <option value="">Default</option>
+                <option value="asc">Termurah ke Termahal</option>
+                <option value="desc">Termahal ke Termurah</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <i class="fas fa-chevron-down"></i>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -200,15 +213,24 @@ export default {
       currentService: null,
       perPage: 10, // Jumlah item per halaman
       currentPage: 1,
+      priceSortOrder: '', // '', 'asc', 'desc'
     };
   },
   computed: {
     filteredServices() {
-      return this.services.filter(service => {
+      let filtered = this.services.filter(service => {
         const typeFilter = !this.selectedTypeId || service.id_type == this.selectedTypeId;
         const searchFilter = !this.searchQuery || service.name.toLowerCase().includes(this.searchQuery.toLowerCase());
         return typeFilter && searchFilter;
       });
+
+      if (this.priceSortOrder === 'asc') {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (this.priceSortOrder === 'desc') {
+        filtered.sort((a, b) => b.price - a.price);
+      }
+
+      return filtered;
     },
     totalPages() {
       return Math.ceil(this.filteredServices.length / this.perPage);
@@ -279,7 +301,7 @@ export default {
       }
     },
     fetchFilteredServices() {
-      this.currentPage = 1; // Reset ke halaman pertama saat filter berubah
+      this.currentPage = 1; // Reset ke halaman pertama saat filter jenis berubah
     },
     searchServices: debounce(function () {
       this.currentPage = 1; // Reset ke halaman pertama saat pencarian berubah
@@ -288,6 +310,9 @@ export default {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
       }
+    },
+    applyPriceSort() {
+      this.currentPage = 1; // Reset ke halaman pertama saat urutan harga berubah
     },
   },
 };
