@@ -1,109 +1,160 @@
 <template>
-  <div class="flex h-screen">
+  <div class="min-h-screen bg-gray-100 flex">
     <Sidebar />
-    <div class="flex-1 p-6 flex flex-col">
+
+    <div class="flex-1 p-8">
       <Header :user="user" @logout="logout" />
 
-      <h2 class="text-2xl font-bold">Services</h2>
+      <div class="bg-white shadow-md rounded-lg p-6 mt-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Layanan</h2>
 
-      <div class="flex justify-between items-center mb-4">
-        <router-link to="/services/create"
-          class="bg-blue-500 text-white text-center px-3 py-2 rounded inline-block max-w-32">
-          Tambah
-        </router-link>
-        <div class="flex items-center gap-3">
-          <label for="typeFilter" class="text-base font-medium">Filter Jenis:</label>
-          <select id="typeFilter" v-model="selectedTypeId" @change="fetchFilteredServices"
-            class="border border-gray-300 px-3 py-2 rounded text-base">
-            <option value="">Semua</option>
-            <option v-for="type in typeServices" :key="type.id" :value="type.id">
-              {{ type.name }}
-            </option>
-          </select>
-        </div>
-        <div class="flex items-center">
-          <label for="search" class="mr-3 text-base font-medium">Cari Layanan:</label>
-          <input type="text" id="search" v-model="searchQuery" @input="searchServices"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-base"
-            placeholder="Masukkan nama layanan" />
-        </div>
-      </div>
+        <div class="flex justify-between items-center mb-6">
+          <router-link to="/services/create"
+            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            <i class="fas fa-plus mr-2"></i> Tambah Layanan
+          </router-link>
 
-      <div class="overflow-x-auto mt-8">
-        <table class="min-w-full table-fixed border-collapse border border-gray-200 text-base">
-          <thead>
-            <tr class="bg-gray-100">
-              <th class="border-b px-3 py-2 w-32">Nama</th>
-              <th class="border-b px-3 py-2 w-64">Deskripsi</th>
-              <th class="border-b px-3 py-2 w-24">Harga</th>
-              <th class="border-b px-3 py-2 w-32">Jenis</th>
-              <th class="border-b px-3 py-2 w-52">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="service in paginatedServices" :key="service.id">
-              <td class="border-b px-3 py-2 truncate" :title="service.name">
-                {{ service.name }}
-              </td>
-              <td class="border-b px-3 py-2 break-words whitespace-normal">
-                {{ service.description }}
-              </td>
-              <td class="border-b px-3 py-2">Rp {{ service.price }}</td>
-              <td class="border-b px-3 py-2 truncate" :title="service.type_service.name">
-                {{ service.type_service.name }}
-              </td>
-              <td class="border-b px-3 py-2 text-center space-x-2">
-                <router-link :to="`/services/edit/${service.id}`"
-                  class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">
-                  <i class="fas fa-pen"></i>
-                </router-link>
-                <button @click="deleteService(service.id)" class="bg-red-500 text-white px-3 py-1 rounded text-sm">
-                  <i class="fas fa-trash-can"></i>
-                </button>
-                <button @click="viewServiceDetail(service)" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          <div class="flex items-center space-x-4">
+            <div>
+              <label for="typeFilter" class="block text-gray-700 text-sm font-bold mb-2">Filter Jenis:</label>
+              <div class="relative">
+                <select id="typeFilter" v-model="selectedTypeId" @change="fetchFilteredServices"
+                  class="block appearance-none w-full bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline text-sm">
+                  <option value="">Semua Jenis</option>
+                  <option v-for="type in typeServices" :key="type.id" :value="type.id">
+                    {{ type.name }}
+                  </option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
 
-      <div v-if="showDetail" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white p-8 rounded shadow-lg w-96 text-center">
-          <h3 class="text-xl font-bold mb-6">Detail Service</h3>
-          <div v-if="currentService.image" class="mt-4 flex justify-center">
-            <img :src="currentService.image" alt="Image" class="max-w-full h-auto object-contain rounded-lg shadow-md"
-              style="max-height: 600px" />
+            <div>
+              <label for="search" class="block text-gray-700 text-sm font-bold mb-2">Cari Layanan:</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input type="text" id="search" v-model="searchQuery" @input="searchServices"
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm pl-10"
+                  placeholder="Cari nama layanan..." />
+              </div>
+            </div>
           </div>
+        </div>
 
-          <table class="mt-6 w-full text-base" style="table-layout: fixed;">
+        <div class="overflow-x-auto">
+          <table class="min-w-full leading-normal">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Nama Layanan
+                </th>
+                <th
+                  class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Deskripsi
+                </th>
+                <th
+                  class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Harga
+                </th>
+                <th
+                  class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Jenis
+                </th>
+                <th
+                  class="px-5 py-3 border-b-2 border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Aksi
+                </th>
+              </tr>
+            </thead>
             <tbody>
-              <tr>
-                <td class="py-3 px-4 font-semibold text-left w-36">Nama Service:</td>
-                <td class="py-3 px-4 text-left">{{ currentService?.name }}</td>
-              </tr>
-
-              <tr>
-                <td class="py-3 px-4 font-semibold text-left w-48">Deskripsi:</td>
-                <td class="py-3 px-4 text-left break-words whitespace-normal">{{ currentService?.description }}</td>
-              </tr>
-
-              <tr>
-                <td class="py-3 px-4 font-semibold text-left w-32">Harga:</td>
-                <td class="py-3 px-4 text-left">Rp{{ currentService?.price }}</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4 font-semibold text-left w-36">Jenis Layanan:</td>
-                <td class="py-3 px-4 text-left">
-                  {{ currentService?.type_service.name }}
+              <tr v-for="service in paginatedServices" :key="service.id" class="hover:bg-gray-50">
+                <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                  <p class="text-gray-900 whitespace-no-wrap truncate" :title="service.name">
+                    {{ service.name }}
+                  </p>
+                </td>
+                <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                  <p class="text-gray-900 break-words whitespace-normal">
+                    {{ service.description }}
+                  </p>
+                </td>
+                <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                  <p class="text-gray-900 whitespace-no-wrap">Rp {{ service.price }}</p>
+                </td>
+                <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                  <p class="text-gray-900 whitespace-no-wrap truncate" :title="service.type_service.name">
+                    {{ service.type_service.name }}
+                  </p>
+                </td>
+                <td class="px-5 py-3 border-b border-gray-200 text-center text-sm">
+                  <div class="inline-flex space-x-2">
+                    <router-link :to="`/services/edit/${service.id}`"
+                      class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs"
+                      title="Edit">
+                      <i class="fas fa-pen"></i>
+                    </router-link>
+                    <button @click="deleteService(service.id)"
+                      class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs"
+                      title="Hapus">
+                      <i class="fas fa-trash-can"></i>
+                    </button>
+                    <button @click="viewServiceDetail(service)"
+                      class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs"
+                      title="Detail">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
           </table>
-          <button @click="showDetail = false" class="bg-gray-400 text-white px-5 py-2 rounded mt-4 text-base">
-            Tutup
-          </button>
+        </div>
+      </div>
+
+      <div v-if="showDetail" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Detail Layanan</h3>
+            <button @click="showDetail = false" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <div v-if="currentService.image" class="mb-4 rounded-md overflow-hidden shadow-md">
+            <img :src="currentService.image" alt="Gambar Layanan" class="w-full h-auto object-cover"
+              style="max-height: 300px;">
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 text-sm">
+            <div>
+              <label class="block text-gray-700 font-semibold mb-1">Nama Layanan:</label>
+              <p class="text-gray-900">{{ currentService?.name }}</p>
+            </div>
+            <div>
+              <label class="block text-gray-700 font-semibold mb-1">Deskripsi:</label>
+              <p class="text-gray-900 break-words whitespace-normal">{{ currentService?.description }}</p>
+            </div>
+            <div>
+              <label class="block text-gray-700 font-semibold mb-1">Harga:</label>
+              <p class="text-gray-900">Rp {{ currentService?.price }}</p>
+            </div>
+            <div>
+              <label class="block text-gray-700 font-semibold mb-1">Jenis Layanan:</label>
+              <p class="text-gray-900">{{ currentService?.type_service?.name }}</p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end">
+            <button @click="showDetail = false"
+              class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              Tutup
+            </button>
+          </div>
         </div>
       </div>
     </div>
