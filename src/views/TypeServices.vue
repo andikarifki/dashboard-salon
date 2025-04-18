@@ -27,6 +27,18 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-if="loading">
+                                    <td colspan="2"
+                                        class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500 text-center">
+                                        Memuat data jenis layanan...
+                                    </td>
+                                </tr>
+                                <tr v-else-if="typeServices.length === 0">
+                                    <td colspan="2"
+                                        class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500 text-center">
+                                        Tidak ada data jenis layanan.
+                                    </td>
+                                </tr>
                                 <tr v-for="type in typeServices" :key="type.id" class="hover:bg-gray-50">
                                     <td class="px-5 py-3 border-b border-gray-200 text-sm">
                                         <div class="pl-8">
@@ -40,12 +52,6 @@
                                                 <i class="fas fa-trash-can mr-2"></i> Hapus
                                             </button>
                                         </div>
-                                    </td>
-                                </tr>
-                                <tr v-if="typeServices.length === 0">
-                                    <td colspan="2"
-                                        class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500 text-center">
-                                        Tidak ada data jenis layanan.
                                     </td>
                                 </tr>
                             </tbody>
@@ -65,24 +71,28 @@ import Header from "../components/Header.vue";
 export default {
     components: {
         Sidebar,
-        Header
+        Header,
     },
     data() {
         return {
             user: {},
             typeServices: [], // Array untuk menyimpan data jenis layanan
+            loading: false, // State untuk menandakan apakah data sedang dimuat
         };
     },
     async created() {
         try {
+            this.loading = true; // Set loading menjadi true saat data mulai dimuat
             const response = await axios.get("/user/profile", {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             this.user = response.data;
-            this.fetchTypeServices(); // Panggil method untuk mengambil data jenis layanan
+            await this.fetchTypeServices(); // Panggil method untuk mengambil data jenis layanan
         } catch (error) {
             localStorage.removeItem("token");
             this.$router.push("/login");
+        } finally {
+            this.loading = false; // Set loading menjadi false setelah data selesai dimuat atau terjadi error
         }
     },
     methods: {
@@ -118,7 +128,7 @@ export default {
                 await axios.delete(`/type-services/${id}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 });
-                this.typeServices = this.typeServices.filter(type => type.id !== id);
+                this.typeServices = this.typeServices.filter((type) => type.id !== id);
             } catch (error) {
                 console.error("Gagal menghapus jenis layanan:", error);
             }
