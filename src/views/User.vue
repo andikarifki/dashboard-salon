@@ -1,44 +1,81 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-screen bg-gray-100">
     <Sidebar />
-    <div class="flex-1 p-6 flex flex-col">
+    <div class="flex-1 p-8 flex flex-col overflow-hidden">
       <Header :user="user" @logout="logout" />
 
-      <h2 class="text-2xl font-bold mb-4">User</h2>
-      <router-link to="/register"
-        class="bg-green-500 hover:bg-green-700 text-white text-center px-0 py-2 rounded mt-4 inline-block w-28">
-        Tambah Akun
-      </router-link>
-      <div class="overflow-x-auto mt-6">
-        <div v-if="loading">Memuat data...</div>
-        <div v-else-if="error">Terjadi kesalahan saat memuat data: {{ error }}</div>
-        <table class="min-w-full table-auto border-collapse border border-gray-200" v-else>
-          <thead>
-            <tr class="bg-gray-100">
-              <th class="border-b px-4 py-2 text-center">Nama</th>
-              <th class="border-b px-4 py-2 text-center">Email</th>
-              <th class="border-b px-4 py-2 text-center">Role</th>
-              <th class="border-b px-4 py-2 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="user in users" :key="user.id">
-              <td class="border-b px-4 py-2 text-center">{{ user.name }}</td>
-              <td class="border-b px-4 py-2 text-center">{{ user.email }}</td>
-              <td class="border-b px-4 py-2 text-center">{{ user.role }}</td>
-              <td class="border-b px-4 py-2 text-center">
-                <button v-if="user.name !== 'admin'" @click="openEditModal(user)"
-                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2">
-                  <i class="fas fa-pen"></i>
-                </button>
-                <button v-if="user.name !== 'admin'" @click="deleteUser(user.id)"
-                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="bg-white shadow-md rounded-lg overflow-y-auto mt-6">
+        <div class="p-6">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">Manajemen Pengguna</h2>
+          <router-link to="/register"
+            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline inline-block mb-4">
+            <i class="fas fa-user-plus mr-2"></i> Tambah Akun
+          </router-link>
+
+          <div v-if="loading" class="text-center py-4">
+            <i class="fas fa-spinner animate-spin text-gray-500 text-xl mr-2"></i> Memuat data...
+          </div>
+          <div v-else-if="error" class="text-red-500 py-4">
+            <i class="fas fa-exclamation-triangle mr-2"></i> Terjadi kesalahan saat memuat data: {{ error }}
+          </div>
+          <div v-else class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Nama
+                  </th>
+                  <th
+                    class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th
+                    class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th
+                    class="px-5 py-3 border-b-2 border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
+                  <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                    <p class="text-gray-900 whitespace-no-wrap">{{ user.name }}</p>
+                  </td>
+                  <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                    <p class="text-gray-900 whitespace-no-wrap">{{ user.email }}</p>
+                  </td>
+                  <td class="px-5 py-3 border-b border-gray-200 text-sm">
+                    <span class="px-2 py-1 font-semibold rounded-full"
+                      :class="{ 'bg-blue-100 text-blue-800': user.role === 'user', 'bg-yellow-100 text-yellow-800': user.role === 'editor', 'bg-gray-200 text-gray-800': user.role === 'admin' }">
+                      {{ user.role }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-3 border-b border-gray-200 text-center text-sm">
+                    <div class="inline-flex space-x-2">
+                      <button v-if="user.name !== 'admin'" @click="openEditModal(user)"
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-3 rounded focus:outline-none focus:shadow-outline text-xs">
+                        <i class="fas fa-pen"></i> Edit
+                      </button>
+                      <button v-if="user.name !== 'admin'" @click="deleteUser(user.id)"
+                        class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-3 rounded focus:outline-none focus:shadow-outline text-xs">
+                        <i class="fas fa-trash"></i> Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="users.length === 0 && !loading">
+                  <td colspan="4" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500 text-center">
+                    Tidak ada data pengguna.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <div v-if="showEditModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
@@ -54,7 +91,7 @@
             <form @submit.prevent="updateUser">
               <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <h3 class="text-lg font-medium text-gray-900 mb-4" id="modal-title">
-                  Edit Pengguna
+                  <i class="fas fa-user-edit mr-2"></i> Edit Pengguna
                 </h3>
                 <div class="mb-4">
                   <label for="edit-modal-name" class="block text-gray-700 text-sm font-bold mb-2">Nama:</label>
@@ -78,12 +115,12 @@
               <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="submit"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                  Simpan
+                  <i class="fas fa-save mr-2"></i> Simpan
                 </button>
                 <button type="button"
                   class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                   @click="closeEditModal">
-                  Batal
+                  <i class="fas fa-times mr-2"></i> Batal
                 </button>
               </div>
             </form>
@@ -133,7 +170,7 @@ export default {
           }
           return 0;
         });
-        this.users = response.data;
+        this.users = usersData;
       } catch (err) {
         this.error = err.message;
         console.error("Gagal memuat data pengguna:", err);
@@ -169,13 +206,13 @@ export default {
           }
         );
         console.log("Berhasil memperbarui pengguna:", response.data);
-        alert("Pengguna berhasil diperbarui.");
+        this.$toast.success("Pengguna berhasil diperbarui.");
         this.closeEditModal(); // Tutup modal edit setelah berhasil
         this.fetchUsers(); // Muat ulang daftar pengguna
       } catch (error) {
         this.error = error.message;
         console.error("Gagal memperbarui pengguna:", error);
-        alert("Gagal memperbarui pengguna.");
+        this.$toast.error("Gagal memperbarui pengguna.");
       }
     },
     async deleteUser(userId) {
@@ -188,11 +225,11 @@ export default {
             },
           });
           this.fetchUsers();
-          alert("Pengguna berhasil dihapus.");
+          this.$toast.success("Pengguna berhasil dihapus.");
         } catch (error) {
           this.error = error.message;
           console.error("Gagal menghapus pengguna:", error);
-          alert("Gagal menghapus pengguna.");
+          this.$toast.error("Gagal menghapus pengguna.");
         }
       }
     },
@@ -203,3 +240,7 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* Tambahkan gaya khusus jika diperlukan */
+</style>

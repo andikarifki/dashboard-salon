@@ -17,7 +17,7 @@
       </li>
       <li class="mb-2" v-if="isAdmin">
         <router-link to="/users" class="block hover:bg-gray-700 p-2 rounded">
-          <i class="fa-solid fa-user-group mr-2"></i>Users</router-link>
+          <i class="fa-solid fa-user-group mr-2"></i>User Management</router-link>
       </li>
     </ul>
   </aside>
