@@ -58,7 +58,9 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div v-if="loading">Memuat data...</div>
+        <div v-else-if="error">Terjadi kesalahan saat memuat data: {{ error }}</div>
+        <div v-else class="overflow-x-auto">
           <table class="min-w-full leading-normal">
             <thead class="bg-gray-50">
               <tr>
@@ -129,7 +131,7 @@
                   </div>
                 </td>
               </tr>
-              <tr v-if="filteredServices.length === 0">
+              <tr v-if="filteredServices.length === 0 && !loading">
                 <td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500 text-center">
                   Tidak ada data layanan.
                 </td>
@@ -138,7 +140,7 @@
           </table>
         </div>
 
-        <div class="flex justify-center items-center mt-6">
+        <div v-if="!loading && !error && filteredServices.length > 0" class="flex justify-center items-center mt-6">
           <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)"
             class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-l focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed">
             Sebelumnya
@@ -160,7 +162,7 @@
             </button>
           </div>
 
-          <div v-if="currentService.image" class="mb-4 rounded-md overflow-hidden shadow-md">
+          <div v-if="currentService?.image" class="mb-4 rounded-md overflow-hidden shadow-md">
             <img :src="currentService.image" alt="Gambar Layanan" class="w-full h-auto object-cover"
               style="max-height: 300px;">
           </div>
@@ -219,6 +221,8 @@ export default {
       perPage: 10, // Jumlah item per halaman
       currentPage: 1,
       priceSortOrder: '', // '', 'asc', 'desc'
+      loading: false,
+      error: null,
     };
   },
   computed: {
@@ -248,19 +252,23 @@ export default {
   },
   async created() {
     try {
+      this.loading = true;
       const response = await axios.get("/user/profile", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       this.user = response.data;
-      this.fetchServices();
-      this.fetchTypeServices();
+      await Promise.all([this.fetchServices(), this.fetchTypeServices()]);
     } catch (error) {
       localStorage.removeItem("token");
       this.$router.push("/login");
+    } finally {
+      this.loading = false;
     }
   },
   methods: {
     async fetchServices() {
+      this.loading = true;
+      this.error = null;
       try {
         const response = await axios.get("/services", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -269,6 +277,9 @@ export default {
         this.currentPage = 1; // Reset ke halaman pertama setelah data baru dimuat
       } catch (error) {
         console.error("Gagal mengambil data services:", error);
+        this.error = "Gagal mengambil data layanan.";
+      } finally {
+        this.loading = false;
       }
     },
     async fetchTypeServices() {
