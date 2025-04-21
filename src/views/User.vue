@@ -143,7 +143,6 @@
                         >
                           <option value="user">User</option>
                           <option value="editor">Editor</option>
-                          <option value="admin">Admin</option>
                         </select>
                       </div>
                       <div class="flex items-center justify-end mt-4">
