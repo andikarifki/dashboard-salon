@@ -24,6 +24,10 @@
             <i class="fa-solid fa-list mr-2"></i>Services</router-link>
         </li>
         <li class="mb-2">
+          <router-link to="/image" class="block hover:bg-gray-700 p-2 rounded">
+            <i class="fa-solid fa-upload mr-2"></i>Image</router-link>
+        </li>
+        <li class="mb-2">
           <router-link to="/type-services" class="block hover:bg-gray-700 p-2 rounded">
             <i class="fa-brands fa-wpforms mr-2"></i>Type Services</router-link>
         </li>

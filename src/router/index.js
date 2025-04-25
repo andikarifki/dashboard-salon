@@ -10,6 +10,7 @@ import EditService from "../pages/EditService.vue";
 import TypeServices from "../views/TypeServices.vue";
 import CreateTypeService from "../pages/TypeServicesCreate.vue";
 import Salon from "../views/salon/Salon.vue";
+import Image from "../views/Image.vue";
 
 const routes = [
   {
@@ -50,6 +51,12 @@ const routes = [
     path: "/type-services",
     name: "TypeServices",
     component: TypeServices,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/image",
+    name: "Image",
+    component: Image,
     meta: { requiresAuth: true },
   },
   {
